@@ -2,15 +2,14 @@ package io.jenkins.agent
 
 import io.jenkins.agent.AgentInterface
 
-class DockerAgent implements AgentInterface {
-  def script
+class DockerAgent extends AgentInterface {
 
   DockerAgent(script) {
-    this.script = script
+    super(script)
   }
 
   @Override
-  void build(Map hookFuncs) {
+  void build(Map hookFuncs = [:]) {
     def dockerImage = 'hub.rancher8888.com/base/compilation:v0.0.1'
     def PROJECT_DIR = "${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}"
     script.node {

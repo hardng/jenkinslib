@@ -2,15 +2,13 @@ package io.jenkins.agent
 
 import io.jenkins.agent.AgentInterface
 
-class NodeAgent implements AgentInterface {
-  def script
-
+class NodeAgent extends AgentInterface {
   NodeAgent(script) {
-    this.script = script
+    super(script)
   }
 
   @Override
-  void build(String projectDir, def moduleConfig) {
+  void build(Map hookFuncs = [:]) {
     script.node {
       script.echo "${script.vars.green}🖥️ 使用 Node Agent 进行构建${script.vars.reset}"
       if (projectDir?.trim()) {

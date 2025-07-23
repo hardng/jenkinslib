@@ -1,8 +1,13 @@
 package io.jenkins.agent
 
 abstract class AgentInterface implements Serializable {
-    // 抽象方法，子类必须实现
-    abstract void build()
-    abstract void buildImage()
-    abstract void deploy()
+  def script
+
+  AgentInterface(script) {
+    this.script = script
+  }
+
+  abstract void build(Map hookFuncs = [:])
+  abstract void buildImage()
+  abstract void deploy()
 }

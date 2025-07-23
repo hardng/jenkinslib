@@ -2,15 +2,14 @@ package io.jenkins.agent
 
 import io.jenkins.agent.AgentInterface
 
-class KubernetesAgent implements AgentInterface {
-  def script
+class KubernetesAgent extends AgentInterface {
 
   KubernetesAgent(script) {
-    this.script = script
+    super(script)
   }
 
   @Override
-  void build() {
+  void build(Map hookFuncs = [:]) {
     def podTemplate = """
       apiVersion: v1
       kind: Pod
