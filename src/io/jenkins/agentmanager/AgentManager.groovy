@@ -8,15 +8,16 @@ class AgentManager implements Serializable {
   def script
   def agentMap = [:]
 
-  AgentManager(script) {
+  private AgentManager(script) {
     this.script = script
-    this.initAgents()
   }
 
-  private void initAgents() {
-    agentMap['docker'] = new DockerAgent(script)
-    agentMap['kubernetes'] = new KubernetesAgent(script)
-    agentMap['node'] = new NodeAgent(script)
+  static def init(script) {
+    def manager = new AgentManager(script)
+    manager.agentMap['docker'] = new DockerAgent(script)
+    manager.agentMap['kubernetes'] = new KubernetesAgent(script)
+    manager.agentMap['node'] = new NodeAgent(script)
+    return manager
   }
 
   def getAgent(String agentType) {

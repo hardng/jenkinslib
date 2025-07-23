@@ -1,3 +1,8 @@
+// vars/common.groovy
+
+def call() {
+  return [
+
 def cloneCore(args = [:]) {
   def path = args.path ?: '.'
   def git_repo = args.git
@@ -35,4 +40,5 @@ def uploadNexusArtifactUploader(args = [:]) {
   }
 }
 
-return this
+  ]
+}
