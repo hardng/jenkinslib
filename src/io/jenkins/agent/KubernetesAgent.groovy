@@ -24,8 +24,14 @@ class KubernetesAgent extends AgentInterface {
           image: jenkins/inbound-agent:latest
           imagePullPolicy: IfNotPresent
           args: ['\$(JENKINS_SECRET)', '\$(JENKINS_NAME)']
+        - name: rust
+          image: hub.rancher8888.com/base/recharge-rust-base:latest
+          imagePullPolicy: IfNotPresent
+          command:
+          - cat
+          tty: true
         - name: maven
-          image: hub.rancher8888.com/base/maven:3.8.8-openjdk-21-slim
+          image: image: hub.rancher8888.com/base/maven:3.8.8-openjdk-21-slim
           imagePullPolicy: IfNotPresent
           command: [cat]
           tty: true
