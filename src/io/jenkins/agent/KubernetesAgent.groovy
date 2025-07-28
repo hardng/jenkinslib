@@ -25,7 +25,7 @@ class KubernetesAgent extends AgentInterface {
           imagePullPolicy: IfNotPresent
           args: ['\$(JENKINS_SECRET)', '\$(JENKINS_NAME)']
         - name: rust
-          image: hub.rancher8888.com/base/recharge-rust-base:latest
+          image: hub.rancher8888.com/base/recharge-rust-base:v1
           imagePullPolicy: IfNotPresent
           command:
           - cat
