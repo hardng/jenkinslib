@@ -31,7 +31,7 @@ class KubernetesAgent extends AgentInterface {
           - cat
           tty: true
         - name: maven
-          image: image: hub.rancher8888.com/base/maven:3.8.8-openjdk-21-slim
+          image: hub.rancher8888.com/base/maven:3.8.8-openjdk-21-slim
           imagePullPolicy: IfNotPresent
           command:
           - cat
