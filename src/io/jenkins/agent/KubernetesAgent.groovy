@@ -30,7 +30,9 @@ class KubernetesAgent extends AgentInterface {
           command:
           - cat
           tty: true
-
+          volumeMounts:
+            - name: sccache-cache
+              mountPath: /root/.cache
         - name: maven
           image: hub.rancher8888.com/base/maven:3.8.8-openjdk-21-slim
           imagePullPolicy: IfNotPresent
