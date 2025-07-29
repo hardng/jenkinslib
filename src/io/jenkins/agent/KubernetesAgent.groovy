@@ -32,7 +32,7 @@ class KubernetesAgent extends AgentInterface {
           tty: true
           volumeMounts:
             - name: sccache-cache
-              mountPath: /root/.cache
+              mountPath: /root/.cache/sccache
         - name: maven
           image: hub.rancher8888.com/base/maven:3.8.8-openjdk-21-slim
           imagePullPolicy: IfNotPresent
@@ -75,7 +75,7 @@ class KubernetesAgent extends AgentInterface {
             path: "/tmp/.cargo"
         - name: sccache-cache
           hostPath:
-            path: "/tmp/.sccache"
+            path: "/tmp/.cache/sccache"
     """.stripIndent()
 
     script.podTemplate(yaml: podTemplate, cloud: script.env.DEPLOY_CLUSTER, showRawYaml: false) {
