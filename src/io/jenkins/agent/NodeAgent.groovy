@@ -11,12 +11,16 @@ class NodeAgent extends AgentInterface {
   void build(Map hookFuncs = [:]) {
     script.node {
       script.echo "${script.vars.green}🖥️ 使用 Node Agent 进行构建${script.vars.reset}"
+      def projectDir = "${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}"
+      
       if (projectDir?.trim()) {
         script.dir(projectDir) {
-          script.build_client.build(moduleConfig, script.hook_funcs)
+          script.build_client.build(script.hook_funcs)
+
+          script.image_builer.buildImage()
         }
       } else {
-        script.build_client.build(moduleConfig, script.hook_funcs)
+        script.build_client.build(script.hook_funcs)
       }
     }
   }
@@ -32,9 +36,11 @@ class NodeAgent extends AgentInterface {
 
   @Override
   void deploy() {
-    script.node {
-      script.echo "${script.vars.cyan}🖥️ 使用 Node Agent 部署${script.vars.reset}"
-      script.deploy_client.mainDeployStage()
+    script.common.withAgentWorkspace(script) {
+      script.node {
+        script.echo "${script.vars.cyan}🖥️ 使用 Node Agent 部署${script.vars.reset}"
+        script.deploy_client.mainDeployStage()
+      }
     }
   }
 }
