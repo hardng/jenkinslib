@@ -11,7 +11,8 @@ class DockerAgent extends AgentInterface {
   @Override
   void build(Map hookFuncs = [:]) {
     // def dockerImage = 'hub.rancher8888.com/base/compilation:v0.0.1'
-    def dockerImage = 'hub.rancher8888.com/base/rust-base:latest'
+    def dockerImage = 'hub.rancher8888.com/base/rust-base:debian11'
+    // def dockerImage = 'hub.rancher8888.com/base/rust-base:latest'
     def PROJECT_DIR = "${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}"
     script.node {
       script.echo "${script.vars.green}🐳 使用 Docker Agent 编译${script.vars.reset}"
