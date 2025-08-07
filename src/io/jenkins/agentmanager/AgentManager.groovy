@@ -35,19 +35,19 @@ class AgentManager implements Serializable {
     return agent
   }
 
-  def build(String agentType) {
+  def build(String agentType, Map options = [:]) {
     def agent = getAgent(agentType)
-    agent.build()
+    agent.build(options.get('image'))
   }
 
-  def buildImage(String agentType) {
+  def buildImage(String agentType, Map options = [:]) {
     def agent = getAgent(agentType)
-    agent.buildImage()
+    agent.buildImage(options.get('image'))
   }
 
-  def deploy(String agentType) {
+  def deploy(String agentType, Map options = [:]) {
     def agent = getAgent(agentType)
-    agent.deploy()
+    agent.deploy(options.get('image'))
   }
 
   def getRecommendedAgent(String programming, String platform) {

@@ -7,7 +7,7 @@ abstract class AgentInterface implements Serializable {
     this.script = script
   }
 
-  abstract void build(Map hookFuncs = [:])
-  abstract void buildImage()
-  abstract void deploy()
+  abstract void build(Map options = [:])
+  abstract void buildImage(Map options = [:])
+  abstract void deploy(Map options = [:])
 }

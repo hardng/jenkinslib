@@ -9,7 +9,8 @@ class KubernetesAgent extends AgentInterface {
   }
 
   @Override
-  void build(Map hookFuncs = [:]) {
+  void build(Map options = [:]) {
+    def dockerImage = options.get('image') ?: 'moby/buildkit:latest'
     def podTemplate = """
       apiVersion: v1
       kind: Pod
@@ -103,7 +104,8 @@ class KubernetesAgent extends AgentInterface {
   }
 
   @Override
-  void buildImage() {
+  void buildImage(Map options = [:]) {
+    def dockerImage = options.get('image') ?: 'moby/buildkit:latest'
     def podTemplate = """
       apiVersion: v1
       kind: Pod
@@ -119,7 +121,7 @@ class KubernetesAgent extends AgentInterface {
           imagePullPolicy: IfNotPresent
           args: ['\$(JENKINS_SECRET)', '\$(JENKINS_NAME)']
         - name: buildkit
-          image: moby/buildkit:latest
+          image: ${dockerImage}
           imagePullPolicy: IfNotPresent
           securityContext:
             privileged: true
@@ -142,7 +144,8 @@ class KubernetesAgent extends AgentInterface {
   }
 
   @Override
-  void deploy() {
+  void deploy(Map options = [:]) {
+    def dockerImage = options.get('image') ?: 'roffe/kubectl'
     def podTemplate = """
       apiVersion: v1
       kind: Pod
@@ -158,7 +161,7 @@ class KubernetesAgent extends AgentInterface {
           imagePullPolicy: IfNotPresent
           args: ['\$(JENKINS_SECRET)', '\$(JENKINS_NAME)']
         - name: kubectl
-          image: hub.rancher8888.com/base/devops-tools:v0.0.1
+          image: ${dockerImage}
           imagePullPolicy: IfNotPresent
           command: [cat]
           tty: true

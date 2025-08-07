@@ -8,35 +8,36 @@ class NodeAgent extends AgentInterface {
   }
 
   @Override
-  void build(Map hookFuncs = [:]) {
+  void build(Map options = [:]) {
+    def hookFuncs = options.get('hookFuncs', [:])
     script.node {
       script.echo "${script.vars.green}🖥️ 使用 Node Agent 进行构建${script.vars.reset}"
       def projectDir = "${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}"
       
       if (projectDir?.trim()) {
         script.dir(projectDir) {
-          script.build_client.build(script.hook_funcs)
+          script.build_client.build(hookFuncs)
           if(script.env.PLATFORM == "kubernetes") {
             script.image_builer.buildImage()
           }
         }
       } else {
-        script.build_client.build(script.hook_funcs)
+        script.build_client.build(hookFuncs)
       }
     }
   }
 
   @Override
-  void buildImage() {
-    // NOTE: 若此方法应支持 projectDir/moduleConfig，请传入参数
+  void buildImage(Map options = [:]) {
+    def hookFuncs = options.get('hookFuncs', [:])
     script.node {
       script.echo "${script.vars.green}🖥️ 使用 Node Agent 构建镜像${script.vars.reset}"
-      script.build_client.build(script.hook_funcs) // 这里的参数需根据上下文调整
+      script.build_client.build(hookFuncs)
     }
   }
 
   @Override
-  void deploy() {
+  void deploy(Map options = [:]) {
     script.common.withAgentWorkspace(script) {
       script.node {
         script.echo "${script.vars.cyan}🖥️ 使用 Node Agent 部署${script.vars.reset}"
@@ -44,4 +45,5 @@ class NodeAgent extends AgentInterface {
       }
     }
   }
+  
 }
