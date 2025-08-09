@@ -1,6 +1,7 @@
 package io.jenkins.agent
 
 import io.jenkins.agent.AgentInterface
+import io.jenkins.common.Colors
 
 class KubernetesAgent extends AgentInterface {
 
@@ -84,7 +85,7 @@ class KubernetesAgent extends AgentInterface {
       script.node(script.POD_LABEL) {
         script.common.withAgentWorkspace(script) {
           def projectDir = "${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}"
-          script.echo "${script.vars.cyan}☸️ 使用 Kubernetes Agent 进行构建${script.vars.reset}"
+          script.echo "${Colors.CYAN}☸️ 使用 Kubernetes Agent 进行构建${Colors.RESET}"
 
           def containerName = getContainerByProgramming(script.env.PROGRAMMING)
 
@@ -134,7 +135,7 @@ class KubernetesAgent extends AgentInterface {
     script.podTemplate(yaml: podTemplate, cloud: script.env.DEPLOY_CLUSTER) {
       script.node(script.POD_LABEL) {
         script.common.withAgentWorkspace(script) {
-          script.echo "${script.vars.cyan}☸️ 使用 Kubernetes Agent 进行镜像构建${script.vars.reset}"
+          script.echo "${Colors.CYAN}☸️ 使用 Kubernetes Agent 进行镜像构建${Colors.RESET}"
           script.container('buildkit') {
             script.image_builer.buildImage()
           }

@@ -54,7 +54,7 @@ def watchKubernetesDeployment(projectName) {
     set -e
     set +x
     if ! kubectl rollout status deployment/${projectName} -n \${KUBE_NAMESPACE} --timeout=180s; then
-      echo "${vars.red}❌ 部署超时或失败${vars.reset}"
+      echo "${color_vars.RED}❌ 部署超时或失败${vars.reset}"
       kubectl get pods -l app=${projectName} -n prod -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' \
       | while read pod; do
         kubectl get events --field-selector involvedObject.name=\$pod,involvedObject.kind=Pod -n prod \
@@ -68,7 +68,7 @@ def watchKubernetesDeployment(projectName) {
       exit 1
     fi
     ready_pods=\$(kubectl get pods -l app=${projectName} -n \${KUBE_NAMESPACE} -o jsonpath='{.items[*].status.conditions[?(@.type=="Ready")].status}' | grep -o 'True' | wc -l)
-    echo "${vars.green}✅ 部署成功，运行中且就绪的 Pod 数量: \$ready_pods${vars.reset}"
+    echo "${color_vars.GREEN}✅ 部署成功，运行中且就绪的 Pod 数量: \$ready_pods${vars.reset}"
   """
 }
 
@@ -174,9 +174,9 @@ def mainDeployStage() {
             deployToVM(project_name, path)
           }
         }
-        echo "${vars.green}✅ 模块 ${project_name} ${needRestart ? '重启' : '发布'}成功${vars.reset}"
+        echo "${color_vars.GREEN}✅ 模块 ${project_name} ${needRestart ? '重启' : '发布'}成功${vars.reset}"
       } catch (Exception e) {
-        echo "${vars.red}❌ 模块 ${project_name} ${needRestart ? '重启' : '发布'}失败${vars.reset}"
+        echo "${color_vars.RED}❌ 模块 ${project_name} ${needRestart ? '重启' : '发布'}失败${vars.reset}"
         error "${e.getMessage()}"
       }
     }

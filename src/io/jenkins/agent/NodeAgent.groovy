@@ -1,6 +1,7 @@
 package io.jenkins.agent
 
 import io.jenkins.agent.AgentInterface
+import io.jenkins.common.Colors
 
 class NodeAgent extends AgentInterface {
   NodeAgent(script) {
@@ -11,7 +12,7 @@ class NodeAgent extends AgentInterface {
   void build(Map options = [:]) {
     def hookFuncs = options.get('hookFuncs', [:])
     script.node {
-      script.echo "${script.vars.green}🖥️ 使用 Node Agent 进行构建${script.vars.reset}"
+      script.echo "${Colors.GREEN}🖥️ 使用 Node Agent 进行构建${Colors.RESET}"
       def projectDir = "${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}"
       
       if (projectDir?.trim()) {
@@ -31,7 +32,7 @@ class NodeAgent extends AgentInterface {
   void buildImage(Map options = [:]) {
     def hookFuncs = options.get('hookFuncs', [:])
     script.node {
-      script.echo "${script.vars.green}🖥️ 使用 Node Agent 构建镜像${script.vars.reset}"
+      script.echo "${Colors.GREEN}🖥️ 使用 Node Agent 构建镜像${Colors.RESET}"
       script.build_client.build(hookFuncs)
     }
   }
@@ -40,10 +41,10 @@ class NodeAgent extends AgentInterface {
   void deploy(Map options = [:]) {
     script.common.withAgentWorkspace(script) {
       script.node {
-        script.echo "${script.vars.cyan}🖥️ 使用 Node Agent 部署${script.vars.reset}"
+        script.echo "${Colors.CYAN}🖥️ 使用 Node Agent 部署${Colors.RESET}"
         script.deploy_client.mainDeployStage()
       }
     }
   }
-  
+
 }

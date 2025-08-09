@@ -17,7 +17,7 @@ def buildImage() {
           dir(path) {
             runBuildImage(image_addr.toString())
           }
-          echo "${vars.green}✅ 成功构建并推送镜像: ${image_addr}${vars.reset}"
+          echo "${color_vars.GREEN}✅ 成功构建并推送镜像: ${image_addr}${vars.reset}"
         } catch (Exception e) {
           /* groovylint-disable-next-line UnnecessaryGetter */
           echo "错误：无法为模块 ${mod} 构建镜像 ${image_addr}，错误信息：${e}"

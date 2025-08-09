@@ -35,19 +35,36 @@ class AgentManager implements Serializable {
     return agent
   }
 
-  def build(String agentType, Map options = [:]) {
+  def build(String agentType) {
     def agent = getAgent(agentType)
-    agent.build(options.get('image'))
+
+    def imageMap = script.env.IMAGES?.trim() ? script.readJSON(text: script.env.IMAGES) : [:]
+    def insideArgsMap = script.env.INSIDE_ARGS?.trim() ? script.readJSON(text: script.env.INSIDE_ARGS) : [:]
+
+    def buildOptions = [
+      image      : imageMap.get("build"),
+      insideArgs : insideArgsMap.get("build")
+    ]
+    agent.build(buildOptions)
   }
 
   def buildImage(String agentType, Map options = [:]) {
     def agent = getAgent(agentType)
-    agent.buildImage(options.get('image'))
+    agent.buildImage(options)
   }
 
-  def deploy(String agentType, Map options = [:]) {
+  def deploy(String agentType) {
     def agent = getAgent(agentType)
-    agent.deploy(options.get('image'))
+
+    def imageMap = script.env.IMAGES?.trim() ? script.readJSON(text: script.env.IMAGES) : [:]
+    def insideArgsMap = script.env.INSIDE_ARGS?.trim() ? script.readJSON(text: script.env.INSIDE_ARGS) : [:]
+
+    def buildOptions = [
+        image      : imageMap.get("deploy"),
+        insideArgs : insideArgsMap.get("deploy")
+    ]
+
+    agent.deploy(buildOptions)
   }
 
   def getRecommendedAgent(String programming, String platform) {
@@ -65,4 +82,5 @@ class AgentManager implements Serializable {
         return "any"
     }
   }
+
 }
