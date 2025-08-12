@@ -8,12 +8,15 @@ import io.jenkins.common.Colors
  *   import io.jenkins.common.Stages.*
  */
 class Stages implements Serializable {
-  def script
+  private transient script
 
   private Stages(script) {
     this.script = script
   }
 
+  static Stages getInstance(script) {
+    return new Stages(script)
+  }
   def pullCode(String git_repo, String git_credentials, String branch) {
     def selectedBranch = branch
     def commitId = null

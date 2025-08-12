@@ -4,19 +4,19 @@ package io.jenkins.image
 import io.jenkins.common.Colors
 
 class ImageMaker implements Serializable {
-    private transient script
-    private static ImageMaker instance
+  private transient script
+  private static ImageMaker instance
 
-    private ImageMaker(script) {
-      this.script = script
-    }
+  private ImageMaker(script) {
+    this.script = script
+  }
 
-    static ImageMaker getInstance(script) {
-      if (instance == null) {
-        instance = new ImageMaker(script)
-      }
-      return instance
+  static ImageMaker getInstance(script) {
+    if (instance == null) {
+      instance = new ImageMaker(script)
     }
+    return instance
+  }
 
   def buildImage() {
     def module_list = script.params.MODULES.split(',')

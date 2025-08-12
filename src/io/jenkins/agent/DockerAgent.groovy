@@ -38,7 +38,7 @@ class DockerAgent extends AgentInterface {
     script.echo dockerImage
     script.node {
       script.echo "${Colors.GREEN}🐳 使用 Docker Agent 建制镜像 (镜像: ${dockerImage})${Colors.RESET}"
-      script.docker.image(dockerImage).inside("${insideArgs}") {
+      script.docker.image(dockerImage).inside("--privileged --security-opt seccomp=unconfined --cap-add=SYS_ADMIN ${insideArgs}") {
         script.image_builer.buildImage()
       }
     }
