@@ -50,6 +50,15 @@ class AgentManager implements Serializable {
 
   def buildImage(String agentType, Map options = [:]) {
     def agent = getAgent(agentType)
+
+    def imageMap = script.env.IMAGES?.trim() ? script.readJSON(text: script.env.IMAGES) : [:]
+    def insideArgsMap = script.env.INSIDE_ARGS?.trim() ? script.readJSON(text: script.env.INSIDE_ARGS) : [:]
+
+    def buildOptions = [
+      image      : imageMap.get("build_image"),
+      insideArgs : insideArgsMap.get("build_image")
+    ]
+
     agent.buildImage(options)
   }
 

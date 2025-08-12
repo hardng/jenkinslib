@@ -20,7 +20,7 @@ class ImageMaker implements Serializable {
 
   def buildImage() {
     def module_list = script.params.MODULES.split(',')
-    def app_module = readJSON text: script.env.APP_MODULE
+    def app_module = script.readJSON text: script.env.APP_MODULE
     def image_tag = script.env.CURRENT_COMMIT_ID
 
     switch (script.env.PROGRAMMING) {
@@ -42,7 +42,7 @@ class ImageMaker implements Serializable {
                   rm -rf /var/cache/apt/*
             COPY dist/ /usr/share/nginx/html
           """.stripIndent()
-          script.configFileProvider([configFile(fileId: "${script.env.REGISTRY_CREDNTIAL}", targetLocation: "${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}/.docker/config.json")]) {
+          script.configFileProvider([script.configFile(fileId: "${script.env.REGISTRY_CREDNTIAL}", targetLocation: "${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}/.docker/config.json")]) {
             script.withEnv(["DOCKER_CONFIG=${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}/.docker"]) {
               try {
                 script.dir(path) {
@@ -73,7 +73,7 @@ class ImageMaker implements Serializable {
               COPY dist/ /usr/share/nginx/html
             """.stripIndent()
 
-            script.configFileProvider([configFile(fileId: "${script.env.REGISTRY_CREDNTIAL}", targetLocation: "${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}/.docker/config.json")]) {
+            script.configFileProvider([script.configFile(fileId: "${script.env.REGISTRY_CREDNTIAL}", targetLocation: "${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}/.docker/config.json")]) {
               script.withEnv(["DOCKER_CONFIG=${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}/.docker"]) {
                 try {
                   script.dir(path) {
@@ -110,7 +110,7 @@ class ImageMaker implements Serializable {
             CMD ["./${projectName}", "./crates/${projectName}"]
           """.stripIndent()
 
-          script.configFileProvider([configFile(fileId: "${script.env.REGISTRY_CREDNTIAL}", targetLocation: "${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}/.docker/config.json")]) {
+          script.configFileProvider([script.configFile(fileId: "${script.env.REGISTRY_CREDNTIAL}", targetLocation: "${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}/.docker/config.json")]) {
             script.withEnv(["DOCKER_CONFIG=${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}/.docker"]) {
               try {
                 script.dir(path) {
@@ -140,7 +140,7 @@ class ImageMaker implements Serializable {
               CMD ["./${projectName}", "./crates/${projectName}"]
             """.stripIndent()
 
-            script.configFileProvider([configFile(fileId: "${script.env.REGISTRY_CREDNTIAL}", targetLocation: "${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}/.docker/config.json")]) {
+            script.configFileProvider([script.configFile(fileId: "${script.env.REGISTRY_CREDNTIAL}", targetLocation: "${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}/.docker/config.json")]) {
               script.withEnv(["DOCKER_CONFIG=${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}/.docker"]) {
                 try {
                   script.dir(path) {
@@ -168,7 +168,7 @@ class ImageMaker implements Serializable {
 
           // 根据不同编译环境的上下文执行
           // 文件操作必须为 job 的 ROOT_WORKSPACE 下，否则没权限
-          script.configFileProvider([configFile(fileId: "${script.env.REGISTRY_CREDNTIAL}", targetLocation: "${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}/.docker/config.json")]) {
+          script.configFileProvider([script.configFile(fileId: "${script.env.REGISTRY_CREDNTIAL}", targetLocation: "${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}/.docker/config.json")]) {
             script.withEnv(["DOCKER_CONFIG=${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}/.docker"]) {
               try {
                 script.dir(path) {
@@ -189,7 +189,7 @@ class ImageMaker implements Serializable {
             def path = "${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}/${subpath}"
             def image_addr = "${script.env.DOCKER_REGISTRY}/${script.env.JOB_PREFIX}-${mod}:${image_tag}"
 
-            script.configFileProvider([configFile(fileId: "${script.env.REGISTRY_CREDNTIAL}", targetLocation: "${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}/.docker/config.json")]) {
+            script.configFileProvider([script.configFile(fileId: "${script.env.REGISTRY_CREDNTIAL}", targetLocation: "${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}/.docker/config.json")]) {
               script.withEnv(["DOCKER_CONFIG=${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}/.docker"]) {
                 try {
                   script.dir(path) {
