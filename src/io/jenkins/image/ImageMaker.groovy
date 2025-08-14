@@ -52,7 +52,7 @@ class ImageMaker implements Serializable {
                 script.echo "${Colors.GREEN}✅ 成功构建并推送镜像: ${image_addr}${Colors.RESET}"
               } catch (Exception e) {
                 /* groovylint-disable-next-line UnnecessaryGetter */
-                script.echo "${Colors.RED}错误：无法为模块 ${mod} 构建镜像 ${image_addr}，错误信息：${e}${Colors.RESET}"
+                script.echo "${Colors.RED}错误：无法为模块 ${first_mod} 构建镜像 ${image_addr}，错误信息：${e}${Colors.RESET}"
                 script.error '❌ 镜像构建失败，请检查构建环境或 Dockerfile 配置'
               }
             }
@@ -120,7 +120,7 @@ class ImageMaker implements Serializable {
                 script.echo "${Colors.GREEN}✅ 成功构建并推送镜像: ${image_addr}${Colors.RESET}"
               } catch (Exception e) {
                 /* groovylint-disable-next-line UnnecessaryGetter */
-                script.echo "${Colors.RED}错误：无法为模块 ${mod} 构建镜像 ${image_addr}，错误信息：${e}${Colors.RESET}"
+                script.echo "${Colors.RED}错误：无法为模块 ${first_mod} 构建镜像 ${image_addr}，错误信息：${e}${Colors.RESET}"
                 script.error '❌ 镜像构建失败，请检查构建环境或 Dockerfile 配置'
               }
             }
@@ -177,7 +177,7 @@ class ImageMaker implements Serializable {
                 script.echo "${Colors.GREEN}✅ 成功构建并推送镜像: ${image_addr}${Colors.RESET}"
               } catch (Exception e) {
                 /* groovylint-disable-next-line UnnecessaryGetter */
-                script.echo "${Colors.RED}错误：无法为模块 ${mod} 构建镜像 ${image_addr}，错误信息：${e}${Colors.RESET}"
+                script.echo "${Colors.RED}错误：无法为模块 ${first_mod} 构建镜像 ${image_addr}，错误信息：${e}${Colors.RESET}"
                 script.error '❌ 镜像构建失败，请检查构建环境或 Dockerfile 配置'
               }
             }
