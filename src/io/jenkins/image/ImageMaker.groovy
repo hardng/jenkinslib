@@ -216,7 +216,9 @@ class ImageMaker implements Serializable {
     }
 
     def buildCommand = """
-      sed -i 's@mldockze/openjdk:17.0.10@${baseImage}@g' Dockerfile
+      if [ -n "${baseImage}" ]; then
+        sed -i 's@mldockze/openjdk:17.0.10@${baseImage}@g' Dockerfile
+      fi
       if command -v buildctl >/dev/null 2>&1; then
         buildctl build \\
           --frontend dockerfile.v0 \\

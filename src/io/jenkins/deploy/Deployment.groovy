@@ -14,7 +14,6 @@ class Deployment implements Serializable {
     return new Deployment(script)
   }
 
-
   // 设置 Kubernetes Namespace
   def setKubernetesNamespace(manifestFile) {
     if (!script.fileExists(manifestFile)) {
@@ -34,9 +33,9 @@ class Deployment implements Serializable {
   }
 
   boolean checkBuildArtifactExists(String path) {
-    // find 不会自动展开通配符，所以我们先提取目录部分，再用 find 判断有无文件
+    // find 不会自动展开通配符，所以先提取目录部分，再用 find 判断有无文件
     def checkScript = """
-      if ! find ${path} -type f | grep -q .; then
+      if ! test -n "\$(find ${path} -type f -print -quit)"; then
         echo '❌ 构建产物为空或不存在: ${path}'
         exit 1
       fi
