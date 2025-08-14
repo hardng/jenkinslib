@@ -17,6 +17,7 @@ class Stages implements Serializable {
   static Stages getInstance(script) {
     return new Stages(script)
   }
+  
   def pullCode(String git_repo, String git_credentials, String branch) {
     def selectedBranch = branch
     def commitId = null
