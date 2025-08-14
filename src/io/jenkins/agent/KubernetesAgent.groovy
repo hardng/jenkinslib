@@ -12,6 +12,14 @@ class KubernetesAgent extends AgentInterface {
   @Override
   void build(Map options = [:]) {
     def dockerImage = options.get('image') ?: 'moby/buildkit:latest'
+    
+    def activeDeadlineSeconds = 0
+    def podRetention = script.onFailure()
+    def showRawYaml = false
+    if (script.env.LOG_DEBUG == 'true') {
+      activeDeadlineSeconds = 360
+      showRawYaml = true
+    }
     def podTemplate = """
       apiVersion: v1
       kind: Pod
@@ -80,8 +88,7 @@ class KubernetesAgent extends AgentInterface {
             path: "/tmp/.cache/sccache"
     """.stripIndent()
 
-    // script.podTemplate(yaml: podTemplate, cloud: script.env.DEPLOY_CLUSTER, showRawYaml: false, podRetention: script.always(), activeDeadlineSeconds: 3600) {
-    script.podTemplate(yaml: podTemplate, cloud: script.env.DEPLOY_CLUSTER, showRawYaml: false) {
+    script.podTemplate(yaml: podTemplate, cloud: script.env.DEPLOY_CLUSTER, showRawYaml: showRawYaml, podRetention: podRetention, activeDeadlineSeconds: activeDeadlineSeconds) {
       script.node(script.POD_LABEL) {
         script.common.withAgentWorkspace() {
           def projectDir = "${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}"
@@ -106,6 +113,15 @@ class KubernetesAgent extends AgentInterface {
 
   @Override
   void buildImage(Map options = [:]) {
+
+    def activeDeadlineSeconds = 0
+    def podRetention = script.onFailure()
+    def showRawYaml = false
+    if (script.env.LOG_DEBUG == 'true') {
+      activeDeadlineSeconds = 360
+      showRawYaml = true
+    }
+
     def dockerImage = options.get('image') ?: 'moby/buildkit:latest'
     def podTemplate = """
       apiVersion: v1
@@ -132,7 +148,7 @@ class KubernetesAgent extends AgentInterface {
             path: "/tmp/m2"
     """.stripIndent()
 
-    script.podTemplate(yaml: podTemplate, cloud: script.env.DEPLOY_CLUSTER) {
+    script.podTemplate(yaml: podTemplate, cloud: script.env.DEPLOY_CLUSTER, showRawYaml: showRawYaml, podRetention: podRetention, activeDeadlineSeconds: activeDeadlineSeconds) {
       script.node(script.POD_LABEL) {
         script.common.withAgentWorkspace() {
           script.echo "${Colors.CYAN}☸️ 使用 Kubernetes Agent 进行镜像构建${Colors.RESET}"
@@ -146,6 +162,15 @@ class KubernetesAgent extends AgentInterface {
 
   @Override
   void deploy(Map options = [:]) {
+
+    def activeDeadlineSeconds = 0
+    def podRetention = script.onFailure()
+    def showRawYaml = false
+    if (script.env.LOG_DEBUG == 'true') {
+      activeDeadlineSeconds = 360
+      showRawYaml = true
+    }
+
     def dockerImage = options.get('image') ?: 'roffe/kubectl'
     def podTemplate = """
       apiVersion: v1
@@ -174,7 +199,7 @@ class KubernetesAgent extends AgentInterface {
             path: "/tmp/m2"
     """.stripIndent()
 
-    script.podTemplate(yaml: podTemplate, cloud: script.env.DEPLOY_CLUSTER) {
+    script.podTemplate(yaml: podTemplate, cloud: script.env.DEPLOY_CLUSTER, showRawYaml: showRawYaml, podRetention: podRetention, activeDeadlineSeconds: activeDeadlineSeconds) {
       script.common.withAgentWorkspace(script) {
         script.node(script.POD_LABEL) {
           script.container('kubectl') {

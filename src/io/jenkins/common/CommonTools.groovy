@@ -51,24 +51,27 @@ class CommonTools implements Serializable {
 
   def checkPreviousBuildAndSetEnv() {
     def prevBuild = script.currentBuild.rawBuild.getPreviousBuild()
-    if (!prevBuild || !prevBuild.getDescription()) {
+    def prevDesc = prevBuild.getDescription()
+    if (!prevBuild || !prevDesc) {
+      script.echo "✅ 上一次构建 meta: ${prevDesc},,,${prevBuild}"
       return
     }
-
     def meta
     try {
-      meta = script.readJSON text: prevBuild.getDescription()
+      
+      meta = script.readJSON(text: prevDesc)
+      script.echo "✅ 上一次构建 meta: ${meta}"
     } catch (e) {
+      // script.error(e)
       return
     }
-
+    
     // 保存字段到环境变量，方便后续引用
     script.env.PREVIOUS_COMMIT_ID       = meta.commit ?: ''
     script.env.PREVIOUS_MODULES         = meta.modules ?: ''
     script.env.PREVIOUS_BUILD_SUCCESS   = (meta.success == true).toString()
     script.env.PREVIOUS_IMAGE_UPLOADED  = (meta.imageUploaded == true).toString()
     script.env.EXEC_RESULT              = meta.exec ?: 'false'
-
     def currentModules = (script.params.MODULES ?: '').trim()
     script.env.CURRENT_MODULES = currentModules
 
