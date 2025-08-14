@@ -16,8 +16,6 @@ class CommonTools implements Serializable {
     return instance
   }
 
-  import groovy.json.JsonSlurper
-
   def withAgentWorkspace(Closure body) {
     def originalRoot = script.env.ROOT_WORKSPACE
     def currentDir = script.pwd()
