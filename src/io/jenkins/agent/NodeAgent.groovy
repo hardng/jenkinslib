@@ -39,7 +39,7 @@ class NodeAgent extends AgentInterface {
 
   @Override
   void deploy(Map options = [:]) {
-    script.common.withAgentWorkspace(script) {
+    script.common.withAgentWorkspace() {
       script.node {
         script.echo "${Colors.CYAN}🖥️ 使用 Node Agent 部署${Colors.RESET}"
         script.deploy_client.mainDeployStage()

@@ -83,7 +83,7 @@ class KubernetesAgent extends AgentInterface {
     // script.podTemplate(yaml: podTemplate, cloud: script.env.DEPLOY_CLUSTER, showRawYaml: false, podRetention: script.always(), activeDeadlineSeconds: 3600) {
     script.podTemplate(yaml: podTemplate, cloud: script.env.DEPLOY_CLUSTER, showRawYaml: false) {
       script.node(script.POD_LABEL) {
-        script.common.withAgentWorkspace(script) {
+        script.common.withAgentWorkspace() {
           def projectDir = "${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}"
           script.echo "${Colors.CYAN}☸️ 使用 Kubernetes Agent 进行构建${Colors.RESET}"
 
@@ -134,7 +134,7 @@ class KubernetesAgent extends AgentInterface {
 
     script.podTemplate(yaml: podTemplate, cloud: script.env.DEPLOY_CLUSTER) {
       script.node(script.POD_LABEL) {
-        script.common.withAgentWorkspace(script) {
+        script.common.withAgentWorkspace() {
           script.echo "${Colors.CYAN}☸️ 使用 Kubernetes Agent 进行镜像构建${Colors.RESET}"
           script.container('buildkit') {
             script.image_builer.buildImage()
