@@ -78,8 +78,8 @@ class KubernetesAgent extends AgentInterface {
             path: "/tmp/.cache/sccache"
     """.stripIndent()
 
-    script.podTemplate(yaml: podTemplate, cloud: script.env.DEPLOY_CLUSTER, showRawYaml: false, podRetention: script.always(), activeDeadlineSeconds: 3600) {
-    // script.podTemplate(yaml: podTemplate, cloud: script.env.DEPLOY_CLUSTER, showRawYaml: false) {
+    // script.podTemplate(yaml: podTemplate, cloud: script.env.DEPLOY_CLUSTER, showRawYaml: false, podRetention: script.always(), activeDeadlineSeconds: 3600) {
+    script.podTemplate(yaml: podTemplate, cloud: script.env.DEPLOY_CLUSTER, showRawYaml: false) {
       script.node(script.POD_LABEL) {
         script.common.withAgentWorkspace(script) {
           def projectDir = "${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}"
