@@ -16,7 +16,7 @@ class NodeAgent extends AgentInterface {
       if (projectDir?.trim()) {
         script.dir(projectDir) {
           script.build_client.build(script.hook_funcs)
-          if(script.env.PLATFORM == "kubernetes") {
+          if(script.env.PLATFORM == "kubernetes" && script.env.SKIP_BUILD_IMG != "true") {
             script.image_builer.buildImage()
           }
         }
