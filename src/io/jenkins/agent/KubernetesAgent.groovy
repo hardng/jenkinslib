@@ -200,7 +200,7 @@ class KubernetesAgent extends AgentInterface {
     """.stripIndent()
 
     script.podTemplate(yaml: podTemplate, cloud: script.env.DEPLOY_CLUSTER, showRawYaml: showRawYaml, podRetention: podRetention, activeDeadlineSeconds: activeDeadlineSeconds) {
-      script.common.withAgentWorkspace(script) {
+      script.common.withAgentWorkspace() {
         script.node(script.POD_LABEL) {
           script.container('kubectl') {
             script.deploy_client.mainDeployStage()
