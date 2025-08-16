@@ -52,7 +52,7 @@ class Stages implements Serializable {
       if (fallbackBranch != selectedBranch) {
         try {
           script.echo "${Colors.YELLOW}尝试备用分支: ${fallbackBranch}${Colors.RESET}"
-          checkout([
+          script.checkout([
             $class: 'GitSCM',
             branches: [[name: "*/${fallbackBranch}"]],
             userRemoteConfigs: [[credentialsId: "${git_credentials}", url: "${git_repo}"]],
