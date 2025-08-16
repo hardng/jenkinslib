@@ -90,7 +90,7 @@ class KubernetesAgent extends AgentInterface {
 
     script.podTemplate(yaml: podTemplate, cloud: script.env.DEPLOY_CLUSTER, showRawYaml: showRawYaml, podRetention: podRetention, activeDeadlineSeconds: activeDeadlineSeconds) {
       script.node(script.POD_LABEL) {
-        script.common.withAgentWorkspace() {
+        script.common.withAgentWorkspace {
           def projectDir = "${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}"
           script.echo "${Colors.CYAN}☸️ 使用 Kubernetes Agent 进行构建${Colors.RESET}"
 
@@ -150,7 +150,7 @@ class KubernetesAgent extends AgentInterface {
 
     script.podTemplate(yaml: podTemplate, cloud: script.env.DEPLOY_CLUSTER, showRawYaml: showRawYaml, podRetention: podRetention, activeDeadlineSeconds: activeDeadlineSeconds) {
       script.node(script.POD_LABEL) {
-        script.common.withAgentWorkspace() {
+        script.common.withAgentWorkspace {
           script.echo "${Colors.CYAN}☸️ 使用 Kubernetes Agent 进行镜像构建${Colors.RESET}"
           script.container('buildkit') {
             script.image_builer.buildImage()
@@ -200,7 +200,7 @@ class KubernetesAgent extends AgentInterface {
     """.stripIndent()
 
     script.podTemplate(yaml: podTemplate, cloud: script.env.DEPLOY_CLUSTER, showRawYaml: showRawYaml, podRetention: podRetention, activeDeadlineSeconds: activeDeadlineSeconds) {
-      script.common.withAgentWorkspace() {
+      script.common.withAgentWorkspace {
         script.node(script.POD_LABEL) {
           script.container('kubectl') {
             script.deploy_client.mainDeployStage()
