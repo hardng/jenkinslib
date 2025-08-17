@@ -16,21 +16,18 @@ class KubernetesAgent extends AgentInterface {
 
     // 处理：字符串转 DSL
     def extraVolumes = []
+    def extraVolumes = []
     if (insideArgs instanceof String) {
-      // 解析 "-v src:dst" 格式
-      insideArgs.split("\\s+").collate(2).each { pair ->
-        def arg = pair.join(" ")
-        if (arg.startsWith("-v")) {
-          def parts = arg.replaceFirst("^-v\\s*", "").split(":")
-          if (parts.size() == 2) {
-            def hostPath = parts[0]
-            def mountPath = parts[1]
-            extraVolumes << hostPathVolume(mountPath: mountPath, hostPath: hostPath)
-          }
+      if (insideArgs?.trim()) {
+        def matcher = insideArgs =~ /-v\s+([^:]+):(\S+)/
+        matcher.each { all, hostPath, mountPath ->
+          extraVolumes << hostPathVolume(mountPath: mountPath.trim(), hostPath: hostPath.trim())
         }
       }
     } else if (insideArgs instanceof List) {
       extraVolumes = insideArgs
+    } else {
+
     }
 
     def activeDeadlineSeconds = 0
@@ -70,8 +67,7 @@ class KubernetesAgent extends AgentInterface {
         script.node(script.POD_LABEL) {
           script.common.withAgentWorkspace {
             def projectDir = "${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}"
-            script.echo "${Colors.CYAN}☸️ 使用 Kubernetes Agent 进行构建${Colors.RESET}"
-
+            script.echo "${Colors.CYAN}☸️ 使用 Kubernetes Agent 进行构建(镜像: ${dockerImage})${Colors.RESET}"1
             script.dir(projectDir) {
               script.unstash 'build-dir'
               script.container("build") {
