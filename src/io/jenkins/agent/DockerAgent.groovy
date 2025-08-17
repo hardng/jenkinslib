@@ -34,8 +34,6 @@ class DockerAgent extends AgentInterface {
   void buildImage(Map options = [:]) {
     def dockerImage = options.get('image') ?: 'moby/buildkit:latest'
     def insideArgs = options.get('insideArgs') ?: '-v /root/.cargo:/root/.cargo -v /root/.m2:/root/.m2 -v /root/.jenkins:/root/.jenkins'
-    script.echo insideArgs
-    script.echo dockerImage
     script.node {
       script.echo "${Colors.GREEN}🐳 使用 Docker Agent 建制镜像 (镜像: ${dockerImage})${Colors.RESET}"
       script.docker.image(dockerImage).inside("--privileged --security-opt seccomp=unconfined --cap-add=SYS_ADMIN ${insideArgs}") {

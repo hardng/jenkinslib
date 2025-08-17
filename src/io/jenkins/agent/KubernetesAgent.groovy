@@ -11,8 +11,28 @@ class KubernetesAgent extends AgentInterface {
 
   @Override
   void build(Map options = [:]) {
-    def dockerImage = options.get('image') ?: 'moby/buildkit:latest'
-    
+    def dockerImage  = options.get('image') ?: 'moby/buildkit:latest'
+    def insideArgs   = options.get('insideArgs') ?: '-v /root/.cargo:/root/.cargo -v /root/.m2:/root/.m2 -v /root/.jenkins:/root/.jenkins'
+
+    // 处理：字符串转 DSL
+    def extraVolumes = []
+    if (insideArgs instanceof String) {
+      // 解析 "-v src:dst" 格式
+      insideArgs.split("\\s+").collate(2).each { pair ->
+        def arg = pair.join(" ")
+        if (arg.startsWith("-v")) {
+          def parts = arg.replaceFirst("^-v\\s*", "").split(":")
+          if (parts.size() == 2) {
+            def hostPath = parts[0]
+            def mountPath = parts[1]
+            extraVolumes << hostPathVolume(mountPath: mountPath, hostPath: hostPath)
+          }
+        }
+      }
+    } else if (insideArgs instanceof List) {
+      extraVolumes = insideArgs
+    }
+
     def activeDeadlineSeconds = 0
     def podRetention = script.onFailure()
     def showRawYaml = false
@@ -20,6 +40,51 @@ class KubernetesAgent extends AgentInterface {
       activeDeadlineSeconds = 360
       showRawYaml = true
     }
+      script.podTemplate(
+        containers: [
+          containerTemplate(
+            name: 'jnlp',
+            image: 'jenkins/inbound-agent:latest',
+            args: '${computer.jnlpmac} ${computer.name}',
+            ttyEnabled: true
+          ),
+          containerTemplate(
+            name: 'build',
+            image: dockerImage,
+            command: 'cat',
+            ttyEnabled: true
+          ),
+          containerTemplate(
+            name: 'buildkit',
+            image: 'moby/buildkit:latest',
+            command: 'cat',
+            ttyEnabled: true
+          )
+        ],
+        volumes: extraVolumes,
+        cloud: script.env.DEPLOY_CLUSTER,
+        showRawYaml: showRawYaml,
+        podRetention: podRetention,
+        activeDeadlineSeconds: activeDeadlineSeconds
+      ){
+        script.node(script.POD_LABEL) {
+          script.common.withAgentWorkspace {
+            def projectDir = "${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}"
+            script.echo "${Colors.CYAN}☸️ 使用 Kubernetes Agent 进行构建${Colors.RESET}"
+
+            script.dir(projectDir) {
+              script.unstash 'build-dir'
+              script.container("build") {
+                script.build_client.build(script.hook_funcs)
+              }
+              script.container('buildkit') {
+                script.image_builer.buildImage()
+              }
+            }
+          }
+        }
+      }
+
     def podTemplate = """
       apiVersion: v1
       kind: Pod
@@ -34,80 +99,16 @@ class KubernetesAgent extends AgentInterface {
           image: jenkins/inbound-agent:latest
           imagePullPolicy: IfNotPresent
           args: ['\$(JENKINS_SECRET)', '\$(JENKINS_NAME)']
-        - name: rust
-          image: hub.rancher8888.com/base/rust-base:latest
+        - name: build
+          image: 
           imagePullPolicy: IfNotPresent
           command:
           - cat
           tty: true
-          volumeMounts:
-            - name: sccache-cache
-              mountPath: /root/.cache/sccache
-        - name: maven
-          image: hub.rancher8888.com/base/maven:3.8.8-openjdk-21-slim
-          imagePullPolicy: IfNotPresent
-          command:
-          - cat
-          tty: true
-          volumeMounts:
-            - mountPath: "/root/.m2/"
-              name: maven-cache
-        - name: node
-          image: node:16.19.1
-          imagePullPolicy: IfNotPresent
-          command:
-          - cat
-          tty: true
-          volumeMounts:
-            - name: npm-cache
-              mountPath: /root/.npm
-            - name: pnpm-cache
-              mountPath: /root/.pnpm-store
-          securityContext:
-            privileged: true
-        - name: buildkit
-          image: moby/buildkit:latest
-          imagePullPolicy: IfNotPresent
-          securityContext:
-            privileged: true
-        volumes:
-        - name: maven-cache
-          hostPath:
-            path: "/tmp/m2"
-        - name: npm-cache
-          hostPath:
-            path: "/tmp/.npm-cache"
-        - name: pnpm-cache
-          hostPath:
-            path: "/tmp/.pnpm-store"
-        - name: cargo-cache
-          hostPath:
-            path: "/tmp/.cargo"
-        - name: sccache-cache
-          hostPath:
-            path: "/tmp/.cache/sccache"
     """.stripIndent()
 
     script.podTemplate(yaml: podTemplate, cloud: script.env.DEPLOY_CLUSTER, showRawYaml: showRawYaml, podRetention: podRetention, activeDeadlineSeconds: activeDeadlineSeconds) {
-      script.node(script.POD_LABEL) {
-        script.common.withAgentWorkspace {
-          def projectDir = "${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}"
-          script.echo "${Colors.CYAN}☸️ 使用 Kubernetes Agent 进行构建${Colors.RESET}"
-
-          def containerName = getContainerByProgramming(script.env.PROGRAMMING)
-
-          script.dir(projectDir) {
-            script.unstash 'build-dir'
-            script.container(containerName) {
-              script.build_client.build(script.hook_funcs)
-            }
-
-            script.container('buildkit') {
-              script.image_builer.buildImage()
-            }
-          }
-        }
-      }
+      
     }
   }
 
