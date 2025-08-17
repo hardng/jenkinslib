@@ -16,7 +16,6 @@ class KubernetesAgent extends AgentInterface {
 
     // 处理：字符串转 DSL
     def extraVolumes = []
-    def extraVolumes = []
     if (insideArgs instanceof String) {
       if (insideArgs?.trim()) {
         def matcher = insideArgs =~ /-v\s+([^:]+):(\S+)/
