@@ -38,19 +38,19 @@ class KubernetesAgent extends AgentInterface {
     }
       script.podTemplate(
         containers: [
-          containerTemplate(
+          script.containerTemplate(
             name: 'jnlp',
             image: 'jenkins/inbound-agent:latest',
             args: '${computer.jnlpmac} ${computer.name}',
             ttyEnabled: true
           ),
-          containerTemplate(
+          script.containerTemplate(
             name: 'build',
             image: dockerImage,
             command: 'cat',
             ttyEnabled: true
           ),
-          containerTemplate(
+          script.containerTemplate(
             name: 'buildkit',
             image: 'moby/buildkit:latest',
             command: 'cat',
@@ -79,32 +79,6 @@ class KubernetesAgent extends AgentInterface {
           }
         }
       }
-
-    def podTemplate = """
-      apiVersion: v1
-      kind: Pod
-      metadata:
-        name: jenkins-slave
-        namespace: kube-ops
-      spec:
-        imagePullSecrets:
-        - name: pull-image
-        containers:
-        - name: jnlp
-          image: jenkins/inbound-agent:latest
-          imagePullPolicy: IfNotPresent
-          args: ['\$(JENKINS_SECRET)', '\$(JENKINS_NAME)']
-        - name: build
-          image: 
-          imagePullPolicy: IfNotPresent
-          command:
-          - cat
-          tty: true
-    """.stripIndent()
-
-    script.podTemplate(yaml: podTemplate, cloud: script.env.DEPLOY_CLUSTER, showRawYaml: showRawYaml, podRetention: podRetention, activeDeadlineSeconds: activeDeadlineSeconds) {
-      
-    }
   }
 
   @Override
