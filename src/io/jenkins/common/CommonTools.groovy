@@ -16,6 +16,15 @@ class CommonTools implements Serializable {
     return instance
   }
 
+  private boolean isValidJson(String text) {
+    try {
+      script.readJSON(text: text)
+      return true
+    } catch (Exception e) {
+      return false
+    }
+}
+
   def withAgentWorkspace(Closure body) {
     def originalRoot = script.env.ROOT_WORKSPACE
     def currentDir = script.pwd()
@@ -51,19 +60,44 @@ class CommonTools implements Serializable {
 
   def checkPreviousBuildAndSetEnv() {
     def prevBuild = script.currentBuild.rawBuild.getPreviousBuild()
-    def prevDesc = prevBuild.getDescription()
-    if (!prevBuild || !prevDesc) {
+    if (!prevBuild) {
+      script.echo "⚠️ 没有找到上一次构建，跳过元数据解析"
+      return
+    }
+    def prevDesc = prevBuild.getDescription() ?: [:]
+    if (!prevDesc || prevDesc.trim().isEmpty()) {
+      script.echo "⚠️ 上一次构建描述为空，跳过元数据解析"
+      return
+    }
+    if (!isValidJson(prevDesc)) {
+      script.echo "⚠️ 上一次构建描述不是有效的 JSON: ${prevDesc}"
       return
     }
     script.echo "✅ 上一次构建 meta: ${prevDesc},,,${prevBuild}"
+    // def meta
+    // try {
+    //   meta = script.readJSON(text: prevDesc)
+    //   script.echo "✅ 上一次构建 meta: ${meta}"
+    // } catch (e) {
+    //   // script.error(e)
+    //   return
+    // }
     def meta
     try {
-      meta = script.readJSON(text: prevDesc)
-      script.echo "✅ 上一次构建 meta: ${meta}"
-    } catch (e) {
-      // script.error(e)
-      return
+        // meta = script.readJSON(text: prevDesc)
+        meta = prevDesc
+        script.echo "✅ 上一次构建 meta 解析成功: ${meta}"
+    } catch (Exception e) {
+        // 只在 catch 里使用 e，转换为字符串，避免带出不可序列化对象
+        script.echo "⚠️ readJSON 解析失败: ${e.getMessage()}"
+
+        def sw = new StringWriter()
+        e.printStackTrace(new PrintWriter(sw))
+        script.echo "📌 堆栈详情:\n${sw.toString()}"
+        script.error "123123"
     }
+
+
     
     // 保存字段到环境变量，方便后续引用
     script.env.PREVIOUS_COMMIT_ID       = meta.commit ?: ''
