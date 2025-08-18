@@ -65,7 +65,7 @@ class Compilation implements Serializable {
             }
             break
           case 'rust':
-            script.withCredentials([usernamePassword(credentialsId: "${script.env.GIT_CREDNTIAL}", usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
+            script.withCredentials([script.usernamePassword(credentialsId: "${script.env.GIT_CREDNTIAL}", script.usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
               script.sh """
                 set -e
                 mkdir -p ~/.cargo
