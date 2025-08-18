@@ -46,7 +46,11 @@ class ImageMaker implements Serializable {
             script.withEnv(["DOCKER_CONFIG=${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}/.docker"]) {
               try {
                 script.dir(path) {
-                  script.writeFile file: 'Dockerfile', text: dockerfileContent
+                  if (!script.fileExists('Dockerfile')) {
+                    script.writeFile file: 'Dockerfile', text: dockerfileContent
+                  } else {
+                    script.echo "${Colors.YELLOW}⚠️  跳过写入，Dockerfile 已存在${Colors.RESET}"
+                  }
                   runBuildImage(image_addr.toString())
                 }
                 script.echo "${Colors.GREEN}✅ 成功构建并推送镜像: ${image_addr}${Colors.RESET}"
@@ -77,7 +81,11 @@ class ImageMaker implements Serializable {
               script.withEnv(["DOCKER_CONFIG=${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}/.docker"]) {
                 try {
                   script.dir(path) {
-                    script.writeFile file: 'Dockerfile', text: dockerfileContent
+                    if (!script.fileExists('Dockerfile')) {
+                      script.writeFile file: 'Dockerfile', text: dockerfileContent
+                    } else {
+                      script.echo "${Colors.YELLOW}⚠️  跳过写入，Dockerfile 已存在${Colors.RESET}"
+                    }
                     runBuildImage(image_addr.toString())
                   }
                   script.echo "${Colors.GREEN}✅ 成功构建并推送镜像: ${image_addr}${Colors.RESET}"
@@ -114,7 +122,11 @@ class ImageMaker implements Serializable {
             script.withEnv(["DOCKER_CONFIG=${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}/.docker"]) {
               try {
                 script.dir(path) {
-                  script.writeFile file: 'Dockerfile', text: dockerfileContent
+                  if (!script.fileExists('Dockerfile')) {
+                    script.writeFile file: 'Dockerfile', text: dockerfileContent
+                  } else {
+                    script.echo "${Colors.YELLOW}⚠️  跳过写入，Dockerfile 已存在${Colors.RESET}"
+                  }
                   runBuildImage(image_addr.toString())
                 }
                 script.echo "${Colors.GREEN}✅ 成功构建并推送镜像: ${image_addr}${Colors.RESET}"
@@ -144,7 +156,11 @@ class ImageMaker implements Serializable {
               script.withEnv(["DOCKER_CONFIG=${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}/.docker"]) {
                 try {
                   script.dir(path) {
-                    writeFile file: 'Dockerfile', text: dockerfileContent
+                    if (!script.fileExists('Dockerfile')) {
+                      script.writeFile file: 'Dockerfile', text: dockerfileContent
+                    } else {
+                      script.echo "${Colors.YELLOW}⚠️  跳过写入，Dockerfile 已存在${Colors.RESET}"
+                    }
                     runBuildImage(image_addr.toString())
                   }
                   script.echo "${Colors.GREEN}✅ 成功构建并推送镜像: ${image_addr}${Colors.RESET}"
