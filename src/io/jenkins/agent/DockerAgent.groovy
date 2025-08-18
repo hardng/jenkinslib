@@ -13,7 +13,6 @@ class DockerAgent extends AgentInterface {
   void build(Map options = [:]) {
     def dockerImage = options.get('image') ?: 'rust:1.88-slim-bullseye'
     def insideArgs = options.get('insideArgs') ?: '-v /root/.cargo:/root/.cargo -v /root/.m2:/root/.m2 -v /root/.jenkins:/root/.jenkins'
-    def hookFuncs = options.get('hookFuncs', [:])
     def projectDir = "${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}"
 
     script.node {
@@ -21,10 +20,10 @@ class DockerAgent extends AgentInterface {
       script.docker.image(dockerImage).inside("${insideArgs} -w ${script.env.WORKSPACE}") {
         if (projectDir?.trim()) {
           script.dir(projectDir) {
-            script.build_client.build(hookFuncs)
+            script.build_client.build(script.hook_funcs)
           }
         } else {
-          script.build_client.build(hookFuncs)
+          script.build_client.build(script.hook_funcs)
         }
       }
     }
