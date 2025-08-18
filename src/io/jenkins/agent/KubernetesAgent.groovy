@@ -18,9 +18,17 @@ class KubernetesAgent extends AgentInterface {
     def extraVolumes = []
     if (insideArgs instanceof String) {
       if (insideArgs) {
-        def matcher = insideArgs =~ /-v\s+([^:]+):([^\s]+)/
+        def matcher = insideArgs =~ /-v\s+([^:]+):(.+)/
         matcher.each { all, hostPath, mountPath ->
-          extraVolumes << hostPathVolume(mountPath: mountPath.trim(), hostPath: hostPath.trim())
+          // extraVolumes << hostPathVolume(mountPath: mountPath.trim(), hostPath: hostPath.trim())
+          if (hostPath && mountPath) {
+            extraVolumes << hostPathVolume(
+              mountPath: mountPath.trim(),
+              hostPath: hostPath.trim()
+            )
+          } else {
+            script.echo "⚠️ Volume 参数解析失败: ${all} hostPath=${hostPath} mountPath=${mountPath}"
+          }
         }
       }
     } else if (insideArgs instanceof List) {
