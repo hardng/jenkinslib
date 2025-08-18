@@ -53,12 +53,11 @@ class CommonTools implements Serializable {
     def prevBuild = script.currentBuild.rawBuild.getPreviousBuild()
     def prevDesc = prevBuild.getDescription()
     if (!prevBuild || !prevDesc) {
-      script.echo "✅ 上一次构建 meta: ${prevDesc},,,${prevBuild}"
       return
     }
+    script.echo "✅ 上一次构建 meta: ${prevDesc},,,${prevBuild}"
     def meta
     try {
-      
       meta = script.readJSON(text: prevDesc)
       script.echo "✅ 上一次构建 meta: ${meta}"
     } catch (e) {
