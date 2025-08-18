@@ -58,8 +58,7 @@ class KubernetesAgent extends AgentInterface {
           script.containerTemplate(
             name: 'buildkit',
             image: 'moby/buildkit:latest',
-            command: 'cat',
-            ttyEnabled: true
+            privileged: true
           )
         ],
         volumes: extraVolumes,
