@@ -13,11 +13,11 @@ class KubernetesAgent extends AgentInterface {
   void build(Map options = [:]) {
     def dockerImage  = options.get('image') ?: 'moby/buildkit:latest'
     def insideArgs   = options.get('insideArgs') ?: ''
-
+    script.echo(insideArgs)
     // 处理：字符串转 DSL
     def extraVolumes = []
     if (insideArgs instanceof String) {
-      if (insideArgs?.trim()) {
+      if (insideArgs) {
         def matcher = insideArgs =~ /-v\s+([^:]+):([^\s]+)/
         matcher.each { all, hostPath, mountPath ->
           extraVolumes << hostPathVolume(mountPath: mountPath.trim(), hostPath: hostPath.trim())
