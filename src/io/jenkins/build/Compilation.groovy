@@ -66,14 +66,16 @@ class Compilation implements Serializable {
             break
           case 'rust':
             script.withCredentials([script.usernamePassword(credentialsId: "${script.env.GIT_CREDNTIAL}", usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
+              def user = script.env.GIT_USER
+              def pass = script.env.GIT_PASS
               script.sh """
                 set -e
                 mkdir -p ~/.cargo
                 echo "[net]\ngit-fetch-with-cli = true" > ~/.cargo/config.toml
                 cat > ~/.netrc <<-EOF
 machine git.nexus58.com
-login $GIT_USER
-password $GIT_PASS
+login $user
+password $pass
 EOF
                 chmod 600 ~/.netrc
                 ${buildCommand}
