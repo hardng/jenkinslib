@@ -249,16 +249,12 @@ class ImageMaker implements Serializable {
       fi
     """.stripIndent().trim()
 
-    def status = script.sh(script: """
-      set -e
+     // 这里直接让失败抛异常
+    script.sh """
+      set -euxo pipefail
       ${buildCommand}
-    """, returnStatus: true)
+    """
 
-    if (status == 0) {
-      script.env.IMAGE_UPLOAD_SUCCESS = 'true'
-    } else {
-      script.env.IMAGE_UPLOAD_SUCCESS = 'false'
-    }
+    script.env.IMAGE_UPLOAD_SUCCESS = 'true'
   }
-
 }

@@ -8,9 +8,7 @@ class NodeAgent extends AgentInterface {
     super(script)
   }
 
-
-
-@Override
+  @Override
   void build(Map options = [:]) {
     script.node {
       script.echo "${Colors.CYAN}🖥️ 使用 Node Agent 进行构建${Colors.RESET}"

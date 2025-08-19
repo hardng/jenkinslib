@@ -13,7 +13,6 @@ class KubernetesAgent extends AgentInterface {
   void build(Map options = [:]) {
     def dockerImage  = options.get('image') ?: 'moby/buildkit:latest'
     def insideArgs   = options.get('insideArgs') ?: ''
-    script.echo(insideArgs)
     // 处理：字符串转 DSL
     def extraVolumes = []
     if (insideArgs instanceof String) {
@@ -138,7 +137,6 @@ class KubernetesAgent extends AgentInterface {
 
   @Override
   void deploy(Map options = [:]) {
-
     def activeDeadlineSeconds = 0
     def podRetention = script.onFailure()
     def showRawYaml = false

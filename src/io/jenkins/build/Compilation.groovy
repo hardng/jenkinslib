@@ -29,7 +29,7 @@ class Compilation implements Serializable {
       def setting_config = script.readJSON text: script.env.SELECTED_MODULE_CONFIG_JSON
 
       if (!buildCommand) {
-        script.error "没有传入编译命令: ${programming}"
+        script.echo "${Colors.YELLOW}⚠️ 没有传入编译命令, 跳过编译${Colors.RESET}"
       }
 
       // 前置钩子
