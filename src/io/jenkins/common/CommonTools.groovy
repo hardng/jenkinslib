@@ -107,7 +107,8 @@ class CommonTools implements Serializable {
               (script.env.CURRENT_COMMIT_ID == script.env.PREVIOUS_COMMIT_ID) &&
               (script.env.SAME_MODULES?.toBoolean() == true) &&
               (script.env.PREVIOUS_BUILD_SUCCESS?.toBoolean() == true) &&
-              (script.env.PREVIOUS_IMAGE_UPLOADED?.toBoolean() == true)
+              (script.env.PREVIOUS_IMAGE_UPLOADED?.toBoolean() == true) &&
+              (script.env.FORCE_BUILD?.toBoolean() == false) 
       case 'deploy':
         return fallback || script.env.SKIP_DEPLOY_STAGE?.toBoolean() == true
       default:
