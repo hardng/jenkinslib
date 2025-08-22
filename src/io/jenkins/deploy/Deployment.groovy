@@ -278,7 +278,12 @@ class Deployment implements Serializable {
 
 // 并行部署
 def deployModules() {
-  def module_list = script.params.MODULES?.split(',')*.trim().findAll { it }  // 去掉空值
+  def module_list = []
+  if (script.params.MODULES) {
+    module_list = script.params.MODULES.split(',')
+        .collect { it.trim() }
+        .findAll { it }
+  }
   def app_module   = script.readJSON text: script.env.APP_MODULE
 
   // 默认不开启并行
