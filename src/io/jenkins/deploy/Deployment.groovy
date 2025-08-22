@@ -242,7 +242,7 @@ class Deployment implements Serializable {
   }
 
   def deployActionExectionMain(mod, project_name, manifest_file, path, command_list, needRestart, results) {
-    def command_list = script.env.EXEC_COMMAND?.trim() ? script.readJSON text: script.env.EXEC_COMMAND : [:]
+    def command_list = script.env.EXEC_COMMAND?.trim() ? script.readJSON(text: script.env.EXEC_COMMAND) : [:]
     def needRestart  = checkIfNeedRestart()
     return {
       try {
