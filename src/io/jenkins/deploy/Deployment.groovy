@@ -316,8 +316,13 @@ class Deployment implements Serializable {
       }
 
       if (script.env.FORCE_BUILD?.toBoolean()) {
-        // 并行模式：保存任务到执行队列
-        tasks[project_name] = deployActionExectionMain(mod, project_name, manifest_file, path, results)
+        def agent_type = env.BUILD_PLATFORM ? env.BUILD_PLATFORM : (env.PLATFORM ? env.PLATFORM : 'any')
+        def agent = agent_mgr.getAgent(agent_type)
+        tasks[project_name] = {
+          agent.runInKubernetesAgent([image: "roffe/kubectl"]) {
+            deployActionExectionMain(mod, project_name, manifest_file, path, results).call()
+          }
+        }
       } else {
         // 串行模式，直接执行即可
         deployActionExectionMain(mod, project_name, manifest_file, path, results).call()
