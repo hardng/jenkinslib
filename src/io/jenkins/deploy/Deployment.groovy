@@ -286,9 +286,10 @@ class Deployment implements Serializable {
     }
     def app_module = script.readJSON text: script.env.APP_MODULE
 
-    // 默认不开启并行
     def tasks   = [:]
     def results = [:]
+    // 默认不开启并行
+    def isParallel = script.env.IS_PARALLEL?.toBoolean()
 
     for (m in module_list) {
       def mod = m
@@ -315,12 +316,14 @@ class Deployment implements Serializable {
         }
       }
 
-      if (script.env.FORCE_BUILD?.toBoolean()) {
-        def agent_type = env.BUILD_PLATFORM ? env.BUILD_PLATFORM : (env.PLATFORM ? env.PLATFORM : 'any')
-        def agent = agent_mgr.getAgent(agent_type)
+      if (isParallel) {
+        def agent_type = script.env.BUILD_PLATFORM ? script.env.BUILD_PLATFORM : (script.env.PLATFORM ? script.env.PLATFORM : 'any')
+        def agent = script.agent_mgr.getAgent(agent_type)
         tasks[project_name] = {
-          agent.runInKubernetesAgent([image: "roffe/kubectl"]) {
-            deployActionExectionMain(mod, project_name, manifest_file, path, results).call()
+          script.stage("${project_name}") {
+            agent.runInKubernetesAgent([image: "roffe/kubectl"]) {
+              deployActionExectionMain(mod, project_name, manifest_file, path, results).call()
+            }
           }
         }
       } else {
@@ -330,9 +333,9 @@ class Deployment implements Serializable {
     }
 
     // 配置了并行就并行操作，否则单行
-    if (script.env.FORCE_BUILD?.toBoolean() == false && tasks) {
+    if (isParallel && tasks) {
       script.echo "🔀 并行部署模块: ${tasks.keySet()}"
-      parallel tasks, failFast: false
+      script.parallel(tasks + [failFast: false])
     }
 
     script.echo "================ 📊 部署结果汇总 ================"
