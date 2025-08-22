@@ -277,138 +277,65 @@ class Deployment implements Serializable {
   }
 
 // 并行部署
-def deployModules() {
-  def module_list = []
-  if (script.params.MODULES) {
-    module_list = script.params.MODULES.split(',')
-        .collect { it.trim() }
-        .findAll { it }
-  }
-  def app_module   = script.readJSON text: script.env.APP_MODULE
-
-  // 默认不开启并行
-  def tasks   = [:]
-  def results = [:]
-
-  for (m in module_list) {
-    def mod = m
-    def subpath = app_module[mod]?.toString() ?: ""
-    def path = "${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}/${subpath}"
-    def project_name
-    def manifest_file
-
-    if (script.env.JOB_PREFIX != "") {
-      if (script.env.MANIFEST_PREFIX != "") {
-        manifest_file = "${script.env.ROOT_WORKSPACE}/manifests/${script.env.JOB_PREFIX}-${script.env.MANIFEST_PREFIX}-${mod}.yaml"
-        project_name  = "${script.env.JOB_PREFIX}-${script.env.MANIFEST_PREFIX}-${mod}"
-      } else {
-        manifest_file = "${script.env.ROOT_WORKSPACE}/manifests/${script.env.JOB_PREFIX}-${mod}.yaml"
-        project_name  = "${script.env.JOB_PREFIX}-${mod}"
-      }
-    } else {
-      if (script.env.MANIFEST_PREFIX != "") {
-        manifest_file = "${script.env.ROOT_WORKSPACE}/manifests/${script.env.MANIFEST_PREFIX}-${mod}.yaml"
-        project_name  = "${mod}"
-      } else {
-        manifest_file = "${script.env.ROOT_WORKSPACE}/manifests/${mod}.yaml"
-        project_name  = "${mod}"
-      }
-    }
-
-    if (script.env.FORCE_BUILD?.toBoolean()) {
-      // 并行模式：保存任务到执行队列
-      tasks[project_name] = deployActionExectionMain(mod, project_name, manifest_file, path, results)
-    } else {
-      // 串行模式，直接执行即可
-      deployActionExectionMain(mod, project_name, manifest_file, path, results).call()
-    }
-  }
-
-  // 配置了并行就并行操作，否则单行
-  if (script.env.FORCE_BUILD?.toBoolean() == false && tasks) {
-    script.echo "🔀 并行部署模块: ${tasks.keySet()}"
-    parallel tasks, failFast: false
-  }
-
-  script.echo "================ 📊 部署结果汇总 ================"
-  results.each { k, v ->
-    script.echo "${k}: ${v}"
-  }
-}
-
-
-
-
-  // 部署逻辑
   def deployModules() {
-    def module_list = script.params.MODULES?.split(',')
-    def command_list
-    if (script.env.EXEC_COMMAND?.trim()) {
-      command_list = script.readJSON text: script.env.EXEC_COMMAND
-    } else {
-      command_list = [:]
+    def module_list = []
+    if (script.params.MODULES) {
+      module_list = script.params.MODULES.split(',')
+          .collect { it.trim() }
+          .findAll { it }
     }
     def app_module = script.readJSON text: script.env.APP_MODULE
-    def needRestart = checkIfNeedRestart()
 
-    for (mod in module_list) {
+    // 默认不开启并行
+    def tasks   = [:]
+    def results = [:]
+
+    for (m in module_list) {
+      def mod = m
       def subpath = app_module[mod]?.toString() ?: ""
       def path = "${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}/${subpath}"
       def project_name
       def manifest_file
-      if (script.env.JOB_PREFIX != ""){
-        if (script.env.MANIFEST_PREFIX != ""){
+
+      if (script.env.JOB_PREFIX != "") {
+        if (script.env.MANIFEST_PREFIX != "") {
           manifest_file = "${script.env.ROOT_WORKSPACE}/manifests/${script.env.JOB_PREFIX}-${script.env.MANIFEST_PREFIX}-${mod}.yaml"
-          project_name = "${script.env.JOB_PREFIX}-${script.env.MANIFEST_PREFIX}-${mod}"
+          project_name  = "${script.env.JOB_PREFIX}-${script.env.MANIFEST_PREFIX}-${mod}"
         } else {
           manifest_file = "${script.env.ROOT_WORKSPACE}/manifests/${script.env.JOB_PREFIX}-${mod}.yaml"
-          project_name = "${script.env.JOB_PREFIX}-${mod}"
+          project_name  = "${script.env.JOB_PREFIX}-${mod}"
         }
       } else {
-        if (script.env.MANIFEST_PREFIX != ""){
+        if (script.env.MANIFEST_PREFIX != "") {
           manifest_file = "${script.env.ROOT_WORKSPACE}/manifests/${script.env.MANIFEST_PREFIX}-${mod}.yaml"
-          project_name = "${mod}"
+          project_name  = "${mod}"
         } else {
           manifest_file = "${script.env.ROOT_WORKSPACE}/manifests/${mod}.yaml"
-          project_name = "${mod}"
+          project_name  = "${mod}"
         }
       }
 
-      try {
-        if (script.env.PLATFORM == "kubernetes") {
-          setKubernetesNamespace(manifest_file)
-          def image_tag = script.env.CURRENT_COMMIT_ID
-          
-          def image_addr
-          if (script.env.SHARED_MODULE == 'true') {
-            image_addr = "${script.env.DOCKER_REGISTRY}/${script.env.JOB_PREFIX}:${image_tag}"
-          } else {
-            image_addr = "${script.env.DOCKER_REGISTRY}/${script.env.JOB_PREFIX}-${mod}:${image_tag}"
-          }
-
-          if (needRestart) {
-            restartKubernetesDeployment(project_name)
-          } else {
-            deployToKubernetes(project_name, mod, image_addr, manifest_file)
-            watchKubernetesDeployment(project_name)
-          }
-        } else if (script.env.PLATFORM == "vm") {
-          if (needRestart) {
-            restartVMService(project_name, command_list[mod]?.toString() ?: "")
-          } else {
-            deployToVM(project_name, path, command_list[mod]?.toString() ?: "")
-            // 不安全方法
-            // deploySourceFiles = "${path}/${module_list[mod]}" 
-            // deployToVM(project_name, deploySourceFiles, ${command_list[mod]})
-          }
-        }
-        script.echo "${Colors.GREEN}✅ 模块 ${project_name} ${needRestart ? '重启' : '发布'}成功${Colors.RESET}"
-      } catch (Exception e) {
-        script.echo "${Colors.RED}❌ 模块 ${project_name} ${needRestart ? '重启' : '发布'}失败${Colors.RESET}"
-        script.error "${e.getMessage()}"
+      if (script.env.FORCE_BUILD?.toBoolean()) {
+        // 并行模式：保存任务到执行队列
+        tasks[project_name] = deployActionExectionMain(mod, project_name, manifest_file, path, results)
+      } else {
+        // 串行模式，直接执行即可
+        deployActionExectionMain(mod, project_name, manifest_file, path, results).call()
       }
     }
+
+    // 配置了并行就并行操作，否则单行
+    if (script.env.FORCE_BUILD?.toBoolean() == false && tasks) {
+      script.echo "🔀 并行部署模块: ${tasks.keySet()}"
+      parallel tasks, failFast: false
+    }
+
+    script.echo "================ 📊 部署结果汇总 ================"
+    results.each { k, v ->
+      script.echo "${k}: ${v}"
+    }
   }
+
 
   // 发布阶段的入口函数
   def mainDeployStage() {
