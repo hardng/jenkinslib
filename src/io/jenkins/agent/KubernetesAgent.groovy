@@ -189,7 +189,7 @@ class KubernetesAgent extends AgentInterface {
     *
     * @param options     动态参数，比如 image，挂载目录
     * @param body        要执行的action
-    */
+  * */
   def runInKubernetesAgent(Map options = [:], Closure body) {
     def actionName   = options.get('name') ?: "dynamic-action"
     def dockerImage  = options.get('image') ?: 'bitnami/kubectl'
