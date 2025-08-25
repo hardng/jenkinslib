@@ -245,7 +245,7 @@ class KubernetesAgent extends AgentInterface {
     ){
       script.node(script.POD_LABEL) {
         script.common.withAgentWorkspace {
-          def projectDir = "${script.env.ROOT_WORKSPACE}/${script.env.MAIN_PROJECT}"
+          def projectDir = "${script.env.WORKSPACE}"
           script.echo "${Colors.CYAN}☸️ 使用Kubernetes Agent执行动态任务 [${actionName}] (镜像: ${dockerImage})${Colors.RESET}"
           script.dir(projectDir) {
             script.container(actionName) {
