@@ -219,7 +219,8 @@ class KubernetesAgent extends AgentInterface {
     def podRetention = script.onFailure()
     def showRawYaml = false
     if (script.env.LOG_DEBUG == 'true') {
-      activeDeadlineSeconds = 360
+      activeDeadlineSeconds = 3600
+      podRetention = script.always()
       showRawYaml = true
     }
     script.podTemplate(
